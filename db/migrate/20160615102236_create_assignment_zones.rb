@@ -4,7 +4,7 @@ class CreateAssignmentZones < ActiveRecord::Migration
       t.string :name
       t.float :coordinates
 
-      t.timestamps
+      t.timestamps null: false
     end
   end
 end

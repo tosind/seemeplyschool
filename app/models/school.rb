@@ -19,11 +19,6 @@ class School < ActiveRecord::Base
  #  validates_attachment_content_type :image, :content_type => /\Aimage\/.*\Z/
 
 
-  def self.search(search)
-	  where("name LIKE ?", "%#{search}%") 
-	  where("content LIKE ?", "%#{search}%")
-  end
-
 attr_accessor :eligibility, :eligibility_index
   # before_save :recalculate_school_assignment so if they change a school location or add a school it will be reindexed TODO
   before_save :geocode_address

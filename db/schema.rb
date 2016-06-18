@@ -11,9 +11,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160615145256) do
+ActiveRecord::Schema.define(version: 20160615142320) do
 
   create_table "address_ranges", force: :cascade do |t|
+    t.integer  "geocode_id"
+    t.integer  "num_start"
+    t.integer  "num_end"
+    t.boolean  "is_even"
+    t.string   "street"
+    t.string   "zipcode"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -37,13 +43,12 @@ ActiveRecord::Schema.define(version: 20160615145256) do
   add_index "admins", ["email"], name: "index_admins_on_email", unique: true
   add_index "admins", ["reset_password_token"], name: "index_admins_on_reset_password_token", unique: true
 
-# Could not dump table "assignment_zones" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
-
-  create_table "assignments", force: :cascade do |t|
-    t.string   "zone"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+  create_table "assignment_zones", force: :cascade do |t|
+    t.string   "name"
+    t.float    "coordinates"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+    t.text     "json_coordinates"
   end
 
   create_table "categories", force: :cascade do |t|
@@ -62,66 +67,19 @@ ActiveRecord::Schema.define(version: 20160615145256) do
   add_index "cities", ["state_id"], name: "index_cities_on_state_id"
 
   create_table "geocode_grade_walkzone_schools", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.boolean  "transportation_eligible"
+    t.integer  "geocode_id"
+    t.integer  "grade_level_id"
+    t.integer  "school_id"
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
 
   create_table "geocodes", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.integer "assignment_zone_id"
   end
 
   create_table "grade_level_schools", force: :cascade do |t|
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
-    t.text     "uniform_policy"
-  end
-
-  create_table "grade_levels", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "neighborhoods", force: :cascade do |t|
-    t.integer  "city_id"
-    t.string   "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "parcels", force: :cascade do |t|
-    t.string   "build_name"
-    t.string   "address"
-    t.integer  "city_id"
-    t.string   "zipcode"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "principals", force: :cascade do |t|
-    t.string   "first"
-    t.string   "name"
-    t.string   "last"
-    t.string   "titles"
-    t.text     "biography"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "rails_admin_histories", force: :cascade do |t|
-    t.text     "message"
-    t.string   "username"
-    t.integer  "item"
-    t.string   "table"
-    t.integer  "month",      limit: 2
-    t.integer  "year",       limit: 5
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "rails_admin_histories", ["item", "table", "month", "year"], name: "index_rails_admin_histories"
-
-  create_table "school_grades", force: :cascade do |t|
     t.integer  "school_id"
     t.integer  "grade_level_id"
     t.string   "grade_number"
@@ -131,8 +89,8 @@ ActiveRecord::Schema.define(version: 20160615145256) do
     t.integer  "second_choice"
     t.integer  "third_choice"
     t.integer  "fourth_higher_choice"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.integer  "mcas_ela_total"
     t.float    "mcas_ela_advanced"
     t.float    "mcas_ela_proficient"
@@ -148,13 +106,118 @@ ActiveRecord::Schema.define(version: 20160615145256) do
     t.float    "mcas_science_proficient"
     t.float    "mcas_science_needsimprovement"
     t.float    "mcas_science_failing"
+    t.text     "uniform_policy"
+  end
+
+  create_table "grade_levels", force: :cascade do |t|
+    t.string   "name"
+    t.float    "walk_zone_radius"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "grade_levels_schools", id: false, force: :cascade do |t|
+    t.integer  "school_id"
+    t.integer  "grade_level_id"
+    t.string   "grade_number"
+    t.string   "hours"
+    t.integer  "open_seats"
+    t.integer  "first_choice"
+    t.integer  "second_choice"
+    t.integer  "third_choice"
+    t.integer  "fourth_higher_choice"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.integer  "mcas_ela_total"
+    t.float    "mcas_ela_advanced"
+    t.float    "mcas_ela_proficient"
+    t.float    "mcas_ela_needsimprovement"
+    t.float    "mcas_ela_failing"
+    t.integer  "mcas_math_total"
+    t.float    "mcas_math_advanced"
+    t.float    "mcas_math_proficient"
+    t.float    "mcas_math_needsimprovement"
+    t.float    "mcas_math_failing"
+    t.integer  "mcas_science_total"
+    t.float    "mcas_science_advanced"
+    t.float    "mcas_science_proficient"
+    t.float    "mcas_science_needsimprovement"
+    t.float    "mcas_science_failing"
+    t.text     "uniform_policy"
+  end
+
+  create_table "neighborhoods", force: :cascade do |t|
+    t.integer  "city_id"
+    t.string   "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+# Could not dump table "parcels" because of following NoMethodError
+#   undefined method `[]' for nil:NilClass
+
+  create_table "principals", force: :cascade do |t|
+    t.string   "first_name"
+    t.string   "last_name"
+    t.string   "titles"
+    t.text     "biography"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "school_grades", force: :cascade do |t|
+    t.integer  "school_id"
+    t.integer  "grade_level_id"
+    t.string   "grade_number"
+    t.string   "hours"
+    t.integer  "open_seats"
+    t.integer  "first_choice"
+    t.integer  "second_choice"
+    t.integer  "third_choice"
+    t.integer  "fourth_higher_choice"
+    t.integer  "mcas_reading"
+    t.integer  "mcas_math"
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
   end
 
   add_index "school_grades", ["grade_level_id"], name: "index_school_grades_on_grade_level_id"
   add_index "school_grades", ["school_id"], name: "index_school_grades_on_school_id"
 
-# Could not dump table "schools" because of following NoMethodError
-#   undefined method `[]' for nil:NilClass
+  create_table "schools", force: :cascade do |t|
+    t.string   "name"
+    t.text     "description"
+    t.text     "features"
+    t.string   "address"
+    t.integer  "city_id"
+    t.integer  "state_id"
+    t.string   "zipcode"
+    t.float    "lat"
+    t.float    "lng"
+    t.string   "email"
+    t.string   "phone"
+    t.string   "fax"
+    t.integer  "students_count"
+    t.string   "website"
+    t.integer  "org_code"
+    t.integer  "teachers_count"
+    t.string   "short_name"
+    t.integer  "assignment_zone_id"
+    t.integer  "neighborhood_id"
+    t.string   "early_dismissal_time"
+    t.string   "staff_to_student_ratio"
+    t.integer  "principal_id"
+    t.integer  "parcel_id"
+    t.string   "category_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "image_file_name"
+    t.string   "image_content_type"
+    t.integer  "image_file_size"
+    t.datetime "image_updated_at"
+    t.decimal  "latitude"
+    t.decimal  "longitude"
+  end
 
   create_table "states", force: :cascade do |t|
     t.string   "name"
@@ -164,6 +227,7 @@ ActiveRecord::Schema.define(version: 20160615145256) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.boolean  "admin"
     t.string   "email",                  default: "", null: false
     t.string   "encrypted_password",     default: "", null: false
     t.string   "reset_password_token"

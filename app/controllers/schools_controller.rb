@@ -1,6 +1,6 @@
 class SchoolsController < ApplicationController
-before_action :authenticate_user!
-before_action :set_school, only: [:show, :edit, :update, :destroy]
+# before_action :authenticate_user!
+# before_action :set_school, only: [:show, :edit, :update, :destroy]
 
 
 # GET /schools
@@ -11,6 +11,8 @@ def dashboard
 end
 
 def index
+
+  @schools = School.all
      set_session_variables
     
     m, @street_number, @street_name = session[:address].try(:match, (/(\d+)\s+(.*)/)).try(:to_a)
@@ -42,7 +44,7 @@ def index
       end
     end
   end
-  # @schools = School.all
+ 
   # if params[:search]
   # @posts = School.search(params[:search]).order("created_at DESC")
   # else
