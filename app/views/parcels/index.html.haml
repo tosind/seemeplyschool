@@ -1,0 +1,29 @@
+%h1 Listing parcels
+
+%table
+  %thead
+    %tr
+      %th Geometry
+      %th Build name
+      %th Address
+      %th City
+      %th Zipcode
+      %th
+      %th
+      %th
+
+  %tbody
+    - @parcels.each do |parcel|
+      %tr
+        %td= parcel.geometry
+        %td= parcel.build_name
+        %td= parcel.address
+        %td= parcel.city_id
+        %td= parcel.zipcode
+        %td= link_to 'Show', parcel
+        %td= link_to 'Edit', edit_parcel_path(parcel)
+        %td= link_to 'Destroy', parcel, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Parcel', new_parcel_path

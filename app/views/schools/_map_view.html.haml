@@ -1,0 +1,40 @@
+#sidebar
+  #nav
+    %h3.bold
+      = link_to "List View", schools_path(search_params(:view => 'list')), :class => 'sidebar-nav'
+  #mypicks
+    = render :partial => 'favorites'
+  
+= render :partial => 'layouts/navigation'   
+#left-column
+  #page
+    %h2.bold
+      %span.small.nobold.italic
+        Eligible Schools for:&nbsp;
+      == #{@street_number} #{@street_name.try(:titleize)}, #{@geocoded_address.city}, #{@geocoded_address.state} / Grade #{session[:grade_level]}
+      %span.smaller.nobold
+        == &nbsp;#{link_to 'Search Again', page_path('home')}
+    
+    .notes.rounded-corners
+      = image_tag('icons/lightbulb.png')
+      == &nbsp;Below is a map of your eligible schools. The yellow shape represents the #{@assignment_zone.name} Assignment Zone; the flags represent your eligible schools; the house icon is centered on your home address. Click the flags or the school name links to learn more.  Click the 'List View' tab - at right - to return to the previous page.    
+    #map
+      #map-container
+        = walk_zone_map
+      #map-list
+        #options
+          <ul id="markers_list"></ul>
+    .clear-both
+      %ul.horizontal-list
+        %li
+          = image_tag('green-marker-medium.png')
+          Walk Zone School &nbsp;
+        %li
+          = image_tag('yellow-marker-medium.png')
+          Assignment Zone School &nbsp;
+        %li
+          = image_tag('gray-marker-medium.png')
+          Citywide School
+      
+  = render :partial => 'layouts/page_footer'
+  

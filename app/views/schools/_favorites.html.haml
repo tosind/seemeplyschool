@@ -1,0 +1,12 @@
+#favorites_sidebar
+  %h3.bold My Favorites
+  - unless session[:favorites].present?
+    To create a customized list of your top schools, click the star button beside each listing.
+  - else
+    %ol#favorite-list
+      - for school in @favorite_schools
+        %li
+          = school.name
+          = link_to image_tag('icons/bullet_delete.png'), unfavorite_school_path(school.id, address: session[:address], zipcode: session[:zipcode], grade_level: session[:grade_level]), :remote => true, :method => :post
+    
+    = link_to "Compare", compare_schools_path(search_params()), :class => 'blue-button'

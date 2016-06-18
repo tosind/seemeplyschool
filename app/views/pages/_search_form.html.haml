@@ -1,0 +1,85 @@
+%p.medium
+  %span.bold
+    Welcome to DiscoverBPS. 
+  This tool allows parents and students to find eligible schools and create a customized list of favorites. To get started, please enter your information in the search form, below, and then click “Search.”
+  
+%table.slider
+  %tr
+    %td.valign-top
+      %h2.bold.darkblue Find Your Schools
+      - if @address_ranges.present? && @address_ranges.size > 1
+        .medium
+          %p.red.italic== #{image_tag('icons/error.png')} We found #{@address_ranges.size} possible matches - please select your address from the options below
+          %ul
+            - for address in @address_ranges
+              %li
+                %span.large
+                  = link_to "#{@street_number} #{address.street.titleize}, #{address.zipcode}", schools_path(:address => "#{@street_number} #{address.street.titleize}", :zipcode => "#{address.zipcode}", :grade_level => params[:grade_level], :sibling_school => params[:sibling_school])
+      - else
+        = form_tag('/schools', :method => :get, :id => 'search_form') do
+          = hidden_field_tag 'view', 'list'
+          - if flash[:alert].present?
+            .red.medium
+              = image_tag('icons/error.png')
+              =raw flash[:alert]
+          .label.darkgray
+            Address:
+          = text_field_tag :address, '', :class => 'address'
+          %br/
+          .label.darkgray
+            Zipcode:
+          = text_field_tag :zipcode, '', :class => 'zipcode'
+          %br/
+          .label.darkgray
+            Grade:
+          = select_tag :grade_level, options_from_collection_for_select(GradeLevel.all, :number, :number), :class => 'search'
+          %br/
+          .label.darkgray
+            Sibling School:
+          = select_tag :sibling_school, options_from_collection_for_select(School.all(:order => 'name'), :id, :name, :selected => session[:sibling_school]), :include_blank => true, :class => 'search'
+          .search_button
+            = submit_tag "Search"
+        
+    %td.valign-top
+      - featured_schools = School.all.find_all {|x| x.hidden_gem? }
+      .anythingSlider
+        .wrapper
+          %ul.horizontal-list
+            - featured_schools.each do |school|
+              - if school.image?
+                %li
+                  %table.no-padding.no-bottom-margin
+                    %tr
+                      %td.valign-top.no-padding
+                        = image_tag(school.image(:slider), :width=>'490px', :class => 'picture-frame')
+                        .slider_label
+                          = school.name
+                          - if school.assignment_zone.present?
+                            - if school.assignment_zone.name == 'Citywide'
+                              == - Citywide
+                            - else
+                              == - #{school.assignment_zone.name} Zone
+        
+%div.clear-both.italic
+  %ul
+    %li== This tool cannot be used to register a student. Visit #{link_to 'www.bostonpublicschools.org/register', 'http://www.bostonpublicschools.org/register'} for more on school registration. 
+    %li== This application has just been released.  If you encounter any problems, please #{mail_to 'boston@codeforamerica.org', 'let us know'}.
+  
+- content_for :scripts do
+  = javascript_tag do
+    function formatText(index, panel) {return index + "";}
+    $(function () {
+    $('.anythingSlider').anythingSlider({
+    easing: "swing",
+    autoPlay: true,
+    startStopped: false,
+    delay: 6000,
+    animationTime: 600,
+    hashTags: true,
+    buildNavigation: false,
+    pauseOnHover: true,
+    startText: "Start",
+    stopText: "Stop",
+    navigationFormatter: null
+    });    
+    });

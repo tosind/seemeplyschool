@@ -1,0 +1,21 @@
+%table.padded.favorite-school
+  %tr{:id=>"favorite_school_#{school.id}", :class => 'yellow-background draggable'}
+    %td.handle_column
+      = image_tag('icons/handle.png')
+    %td{:height=>'90px' }
+      = image_tag(school.image(:thumb), :class => 'rounded-corners')
+    %td.title_column
+      %h3.bold= school.name
+      %span.italic
+        == #{school.address}, #{school.city.try(:name)}
+        - if school.phone.present?
+          == Phone: #{school.phone}
+    %td &nbsp;
+    %td{:width=>'340'}
+      - if school.preview_hours.present?
+        Preview Hours:
+        = school.preview_hours
+    %td.view_button_column.right_padded
+      = link_to "View", school_path(school.permalink, search_params()), :class => 'blue-button'
+    %td.favorite_button_column
+      = render :partial => 'schools/favorite_button', :locals => {:school => school}
